@@ -1,0 +1,58 @@
+import tensorflow as tenfl
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Conv2D, Flatten, Dropout, MaxPooling2D
+
+# Set up parameters
+num_classes = 7  
+img_h, img_w = 150, 150  
+batch_size = 32  
+epochs = 10  
+
+# Setting  up the paths for data
+train_dir = '/fozan/mec/semester6'
+val_dir = '/fozan/mec/semester6'
+
+
+#  Setting up the data generators
+train_datagen = ImageDataGenerator(rescale=1./255)
+val_datagen = ImageDataGenerator(rescale=1./255)
+
+train_gen = train_datagen.flow_from_directory(train_dir,
+                                              target_size=(img_h, img_w),
+                                              batch_size=batch_size,
+                                              class_mode='categorical')
+
+val_gen = val_datagen.flow_from_directory(val_dir,
+                                          target_size=(img_h, img_w),
+                                          batch_size=batch_size,
+                                          class_mode='categorical')
+
+// Define all the model
+model = Sequential([
+    Conv2D(16, 3, padding='same', activation='relu', input_shape=(img_h, img_w, 3)),
+    MaxPooling2D(),
+    Conv2D(32, 3, padding='same', activation='relu'),
+    MaxPooling2D(),
+    Conv2D(64, 3, padding='same', activation='relu'),
+    MaxPooling2D(),
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dense(num_classes)
+])
+
+// Compiling the models
+model.compile(optimizer='adam',
+              loss=tenfl.keras.losses.CategoricalCrossentropy(from_logits=True),
+              metrics=['accuracy'])
+
+// Training the models
+h = model.fit(train_gen,
+                    steps_per_epoch=train_gen.samples // batch_size,
+                    epochs=epochs,
+                    validation_data=val_gen,
+                    validation_steps=val_gen.samples // batch_size)
+
+// Print for the training history (h)
+for key in h.h .keys():
+    print(key, ': ',h.h [key])
